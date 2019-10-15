@@ -12,10 +12,7 @@ import me.chanjar.weixin.common.util.json.WxGsonBuilder;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpOAuth2AccessToken;
 import me.chanjar.weixin.open.api.*;
-import me.chanjar.weixin.open.bean.WxOpenAuthorizerAccessToken;
-import me.chanjar.weixin.open.bean.WxOpenComponentAccessToken;
-import me.chanjar.weixin.open.bean.WxOpenCreateResult;
-import me.chanjar.weixin.open.bean.WxOpenMaCodeTemplate;
+import me.chanjar.weixin.open.bean.*;
 import me.chanjar.weixin.open.bean.auth.WxOpenAuthorizationInfo;
 import me.chanjar.weixin.open.bean.message.WxOpenXmlMessage;
 import me.chanjar.weixin.open.bean.result.*;
@@ -265,8 +262,8 @@ public class WxOpenComponentServiceImpl implements WxOpenComponentService {
       return "success";
     }
     //快速创建小程序
-    if (StringUtils.equalsIgnoreCase(wxMessage.getInfoType(), "notify_third_fasteregister") && wxMessage.getStatus () == 0) {
-      WxOpenQueryAuthResult queryAuth = wxOpenService.getWxOpenComponentService().getQueryAuth(wxMessage.getAuthCode ());
+    if (StringUtils.equalsIgnoreCase(wxMessage.getInfoType(), "notify_third_fasteregister") && wxMessage.getStatus() == 0) {
+      WxOpenQueryAuthResult queryAuth = wxOpenService.getWxOpenComponentService().getQueryAuth(wxMessage.getAuthCode());
       if (queryAuth == null || queryAuth.getAuthorizationInfo() == null || queryAuth.getAuthorizationInfo().getAuthorizerAppid() == null) {
         throw new NullPointerException("getQueryAuth");
       }
@@ -318,11 +315,11 @@ public class WxOpenComponentServiceImpl implements WxOpenComponentService {
     jsonObject.addProperty("count", len);
     String responseContent = post(url, jsonObject.toString());
     WxOpenAuthorizerListResult ret = WxOpenGsonBuilder.create().fromJson(responseContent, WxOpenAuthorizerListResult.class);
-    if(ret != null && ret.getList() != null){
-      for(Map<String, String> data : ret.getList()){
+    if (ret != null && ret.getList() != null) {
+      for (Map<String, String> data : ret.getList()) {
         String authorizerAppid = data.get("authorizer_appid");
         String refreshToken = data.get("refresh_token");
-        if(authorizerAppid != null && refreshToken != null){
+        if (authorizerAppid != null && refreshToken != null) {
           this.getWxOpenConfigStorage().setAuthorizerRefreshToken(authorizerAppid, refreshToken);
         }
       }
@@ -416,8 +413,8 @@ public class WxOpenComponentServiceImpl implements WxOpenComponentService {
   public List<WxOpenMaCodeTemplate> getTemplateList() throws WxErrorException {
     String responseContent = get(GET_TEMPLATE_LIST_URL, "access_token");
     JsonObject response = JSON_PARSER.parse(StringUtils.defaultString(responseContent, "{}")).getAsJsonObject();
-    boolean hasDraftList = response.has("template_list");
-    if (hasDraftList) {
+    boolean hasTemplateList = response.has("template_list");
+    if (hasTemplateList) {
       return WxOpenGsonBuilder.create().fromJson(response.getAsJsonArray("template_list"),
         new TypeToken<List<WxOpenMaCodeTemplate>>() {
         }.getType());
@@ -450,26 +447,61 @@ public class WxOpenComponentServiceImpl implements WxOpenComponentService {
     return WxOpenCreateResult.fromJson(json);
   }
 
+
   @Override
-  public WxOpenResult fastRegisterWeapp(String name, String code, String codeType, String legalPersonaWechat, String legalPersonaName, String componentPhone) throws WxErrorException{
+  public Boolean bindOpenAccount(String appId, String openAppid) throws WxErrorException {
+    JsonObject param = new JsonObject();
+    param.addProperty("appid", appId);
+    param.addProperty("open_appid", openAppid);
+
+    String json = post(BIND_OPEN_URL, param.toString(), "access_token");
+
+    return WxOpenResult.fromJson(json).isSuccess();
+  }
+
+
+  @Override
+  public Boolean unbindOpenAccount(String appId, String openAppid) throws WxErrorException {
+    JsonObject param = new JsonObject();
+    param.addProperty("appid", appId);
+    param.addProperty("open_appid", openAppid);
+
+    String json = post(UNBIND_OPEN_URL, param.toString(), "access_token");
+
+    return WxOpenResult.fromJson(json).isSuccess();
+  }
+
+
+  @Override
+  public WxOpenGetResult getOpenAccount(String appId) throws WxErrorException {
+    JsonObject param = new JsonObject();
+    param.addProperty("appid", appId);
+
+    String json = post(GET_OPEN_URL, param.toString(), "access_token");
+    return WxOpenGetResult.fromJson(json);
+  }
+
+
+  @Override
+  public WxOpenResult fastRegisterWeapp(String name, String code, String codeType, String legalPersonaWechat, String legalPersonaName, String componentPhone) throws WxErrorException {
     JsonObject jsonObject = new JsonObject();
-    jsonObject.addProperty("name",name);
+    jsonObject.addProperty("name", name);
     jsonObject.addProperty("code", code);
     jsonObject.addProperty("code_type", codeType);
     jsonObject.addProperty("legal_persona_wechat", legalPersonaWechat);
     jsonObject.addProperty("legal_persona_name", legalPersonaName);
     jsonObject.addProperty("component_phone", componentPhone);
-    String response = post(FAST_REGISTER_WEAPP_URL, jsonObject.toString (), "component_access_token");
-    return WxOpenGsonBuilder.create ().fromJson (response, WxOpenResult.class);
+    String response = post(FAST_REGISTER_WEAPP_URL, jsonObject.toString(), "component_access_token");
+    return WxOpenGsonBuilder.create().fromJson(response, WxOpenResult.class);
   }
 
   @Override
-  public WxOpenResult fastRegisterWeappSearch(String name, String legalPersonaWechat, String legalPersonaName) throws WxErrorException{
+  public WxOpenResult fastRegisterWeappSearch(String name, String legalPersonaWechat, String legalPersonaName) throws WxErrorException {
     JsonObject jsonObject = new JsonObject();
-    jsonObject.addProperty("name",name);
+    jsonObject.addProperty("name", name);
     jsonObject.addProperty("legal_persona_wechat", legalPersonaWechat);
     jsonObject.addProperty("legal_persona_name", legalPersonaName);
-    String response = post(FAST_REGISTER_WEAPP_SEARCH_URL, jsonObject.toString (), "component_access_token");
-    return WxOpenGsonBuilder.create ().fromJson (response, WxOpenResult.class);
+    String response = post(FAST_REGISTER_WEAPP_SEARCH_URL, jsonObject.toString(), "component_access_token");
+    return WxOpenGsonBuilder.create().fromJson(response, WxOpenResult.class);
   }
 }

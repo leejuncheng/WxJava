@@ -71,6 +71,34 @@ public interface WxOpenMaService extends WxMaService {
   String API_GET_TESTERLIST = "https://api.weixin.qq.com/wxa/memberauth";
 
   /**
+   * 以下接口基础信息设置
+   * <p>
+   *     https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&t=resource/res_list&verify=1&id=21517799059ZSEMr&token=6f965b5daf30a98a6bbd2a386faea5c934e929bf&lang=zh_CN
+   * </p>
+   */
+
+  /**
+   * 1. 设置小程序隐私设置（是否可被搜索）
+   */
+  String API_CHANGE_WXA_SEARCH_STATUS = "https://api.weixin.qq.com/wxa/changewxasearchstatus";
+
+  /**
+   * 2. 查询小程序当前隐私设置（是否可被搜索）
+   */
+  String API_GET_WXA_SEARCH_STATUS = "https://api.weixin.qq.com/wxa/getwxasearchstatus";
+
+  /**
+   * 3.1. 获取展示的公众号信息
+   */
+  String API_GET_SHOW_WXA_ITEM = "https://api.weixin.qq.com/wxa/getshowwxaitem";
+
+  /**
+   * 3.2 设置展示的公众号
+   */
+  String API_UPDATE_SHOW_WXA_ITEM = "https://api.weixin.qq.com/wxa/updateshowwxaitem";
+
+
+  /**
    * 以下接口为三方平台代小程序实现的代码管理功能
    * <p>
    *     https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&t=resource/res_list&verify=1&id=open1489140610_Uavc4&token=fe774228c66725425675810097f9e48d0737a4bf&lang=zh_CN
@@ -169,6 +197,17 @@ public interface WxOpenMaService extends WxMaService {
 
 
   /**
+   * 查询服务商的当月提审限额和加急次数（Quota）
+   */
+  String API_QUERY_QUOTA = "https://api.weixin.qq.com/wxa/queryquota";
+
+  /**
+   * 加急审核申请
+   */
+  String API_SPEED_AUDIT = "https://api.weixin.qq.com/wxa/speedupaudit";
+
+
+  /**
    * 获得小程序的域名配置信息
    */
   WxOpenMaDomainResult getDomain() throws WxErrorException;
@@ -188,12 +227,29 @@ public interface WxOpenMaService extends WxMaService {
   String getWebViewDomain() throws WxErrorException;
 
   /**
+   * 获取小程序的业务域名
+   *
+   * @return
+   */
+  public WxOpenResult getWebViewDomainInfo() throws WxErrorException;
+
+  /**
    * 设置小程序的业务域名
    *
    * @param action add添加, delete删除, set覆盖
    * @return 直接返回字符串
    */
   String setWebViewDomain(String action, List<String> domainList) throws WxErrorException;
+
+
+  /**
+   * 设置小程序的业务域名
+   *
+   * @param action     add添加, delete删除, set覆盖
+   * @param domainList
+   * @return
+   */
+  WxOpenResult setWebViewDomainInfo(String action, List<String> domainList) throws WxErrorException;
 
   /**
    * 获取小程序的信息
@@ -207,7 +263,7 @@ public interface WxOpenMaService extends WxMaService {
    * @return
    * @throws WxErrorException
    */
-  WxOpenResult bindTester(String wechatid) throws WxErrorException;
+  WxOpenMaBindTesterResult bindTester(String wechatid) throws WxErrorException;
 
   /**
    * 解除绑定小程序体验者
@@ -220,6 +276,34 @@ public interface WxOpenMaService extends WxMaService {
    * 获得体验者列表
    */
   WxOpenMaTesterListResult getTesterList() throws WxErrorException;
+
+
+  /**
+   * 设置小程序隐私设置（是否可被搜索）
+   *
+   * @param status 1表示不可搜索，0表示可搜索
+   */
+  public WxOpenResult changeWxaSearchStatus(Integer status) throws WxErrorException;
+
+
+  /**
+   * 2. 查询小程序当前隐私设置（是否可被搜索）
+   */
+  public WxOpenMaSearchStatusResult getWxaSearchStatus() throws WxErrorException;
+
+  /**
+   * 3.1 获取展示的公众号信息
+   */
+  public WxOpenMaShowItemResult getShowWxaItem() throws WxErrorException;
+
+
+  /**
+   * 3.2 设置展示的公众号
+   *
+   * @param flag    0 关闭，1 开启
+   * @param mpappid 如果开启，需要传新的公众号appid
+   */
+  public WxOpenResult updateShowwxaitem(Integer flag, String mpappid) throws WxErrorException;
 
   /**
    * 1、为授权的小程序帐号上传小程序代码
@@ -273,6 +357,12 @@ public interface WxOpenMaService extends WxMaService {
   WxOpenResult releaesAudited() throws WxErrorException;
 
   /**
+   * 10. 修改小程序线上代码的可见状态（仅供第三方代小程序调用）
+   */
+  public WxOpenResult changeVisitstatus(String action) throws WxErrorException;
+
+
+  /**
    * 11. 小程序版本回退（仅供第三方代小程序调用）
    */
   WxOpenResult revertCodeReleaes() throws WxErrorException;
@@ -289,8 +379,46 @@ public interface WxOpenMaService extends WxMaService {
   String getSupportVersion() throws WxErrorException;
 
   /**
+   * 查询当前设置的最低基础库版本及各版本用户占比 （仅供第三方代小程序调用）
+   */
+  WxOpenMaWeappSupportVersionResult getSupportVersionInfo() throws WxErrorException;
+
+  /**
    * 设置最低基础库版本（仅供第三方代小程序调用）
    */
   String setSupportVersion(String version) throws WxErrorException;
+
+  /**
+   * 设置最低基础库版本（仅供第三方代小程序调用）
+   */
+  WxOpenResult setSupportVersionInfo(String version) throws WxErrorException;
+
+  /**
+   * 16. 小程序分阶段发布 - 1)分阶段发布接口
+   */
+  WxOpenResult grayrelease(Integer grayPercentage) throws WxErrorException;
+
+  /**
+   * 16. 小程序分阶段发布 - 2)取消分阶段发布
+   */
+  WxOpenResult revertgrayrelease() throws WxErrorException;
+
+  /**
+   * 16. 小程序分阶段发布 - 3)查询当前分阶段发布详情
+   */
+  WxOpenMaGrayReleasePlanResult getgrayreleaseplan() throws WxErrorException;
+
+
+  /**
+   * 查询服务商的当月提审限额和加急次数（Quota）
+   * https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Mini_Programs/code/query_quota.html
+   */
+  WxOpenMaQueryQuotaResult queryQuota() throws WxErrorException;
+
+  /**
+   * 加急审核申请
+   * 有加急次数的第三方可以通过该接口，对已经提审的小程序进行加急操作，加急后的小程序预计2-12小时内审完。
+   */
+  Boolean speedAudit(Long auditid) throws WxErrorException;
 
 }

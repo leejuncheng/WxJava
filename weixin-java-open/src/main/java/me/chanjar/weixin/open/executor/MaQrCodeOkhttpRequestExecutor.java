@@ -1,4 +1,4 @@
-package me.chanjar.weixin.open.util.requestexecuter.ma;
+package me.chanjar.weixin.open.executor;
 
 import me.chanjar.weixin.common.WxType;
 import me.chanjar.weixin.common.error.WxError;
@@ -25,14 +25,12 @@ import java.util.UUID;
  * @date 2018-09-13
  */
 public class MaQrCodeOkhttpRequestExecutor extends MaQrCodeRequestExecutor<OkHttpClient, OkHttpProxyInfo> {
-  private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
   public MaQrCodeOkhttpRequestExecutor(RequestHttp requestHttp) {
     super(requestHttp);
   }
 
   @Override
-  public File execute(String uri, WxMaQrcodeParam qrcodeParam) throws WxErrorException, IOException {
+  public File execute(String uri, WxMaQrcodeParam qrcodeParam, WxType wxType) throws WxErrorException, IOException {
     if (qrcodeParam != null && StringUtils.isNotBlank(qrcodeParam.getPagePath())) {
       if (uri.indexOf('?') == -1) {
         uri += '?';
