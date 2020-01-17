@@ -10,6 +10,8 @@ import java.util.List;
 /**
  * 订阅消息.
  * https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/subscribe-message/subscribeMessage.send.html
+ *
+ * @author S
  */
 @Getter
 @Setter
@@ -17,7 +19,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class WxMaSubscribeMessage implements Serializable {
-
   private static final long serialVersionUID = 6846729898251286686L;
 
   /**
@@ -58,13 +59,13 @@ public class WxMaSubscribeMessage implements Serializable {
    * 描述： 模板内容，不填则下发空模板
    * </pre>
    */
-  private List<WxMaSubscribeData> data;
+  private List<Data> data;
 
-
-  public WxMaSubscribeMessage addData(WxMaSubscribeData datum) {
+  public WxMaSubscribeMessage addData(Data datum) {
     if (this.data == null) {
       this.data = new ArrayList<>();
     }
+
     this.data.add(datum);
 
     return this;
@@ -72,6 +73,16 @@ public class WxMaSubscribeMessage implements Serializable {
 
   public String toJson() {
     return WxMaGsonBuilder.create().toJson(this);
+  }
+
+  @lombok.Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Data implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private String name;
+    private String value;
   }
 
 }

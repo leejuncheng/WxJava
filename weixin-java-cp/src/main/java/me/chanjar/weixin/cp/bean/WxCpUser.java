@@ -27,6 +27,11 @@ public class WxCpUser implements Serializable {
   private Gender gender;
   private String email;
   private String avatar;
+  private String thumbAvatar;
+  /**
+   * 地址。长度最大128个字符
+   */
+  private String address;
   private String avatarMediaId;
   private Integer status;
   private Integer enable;
